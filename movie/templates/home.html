@@ -1,3 +1,32 @@
-<!-- <h1>Welcome to Home Page, {{name}}</h1> -->
-<h1>Welcome to Home, <span style="color: blue;">{{name}}</span></h1>
-<h2>This is the full home page</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Películas</h1>
+    
+    <!-- Formulario de búsqueda -->
+    <form method="get" action="">
+        <input type="text" name="searchMovie" value="{{ search_term }}" placeholder="Buscar películas...">
+        <button type="submit">Buscar</button>
+    </form>
+    
+    {% if movies %}
+        <ul>
+            {% for movie in movies %}
+                <li>
+                    <h2>{{ movie.title }}</h2>
+                    <p>{{ movie.description }}</p>
+                    {% if movie.image %}
+                        <img src="{{ movie.image.url }}" alt="{{ movie.title }}" style="max-width: 200px;">
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay películas disponibles.</p>
+    {% endif %}
+</body>
+</html>
