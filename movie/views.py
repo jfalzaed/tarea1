@@ -32,10 +32,10 @@ def signup(request):
 def statistics_view(request):
     matplotlib.use('Agg')
 
-    # Obtener todas las películas
+    # Películas
     all_movies = Movie.objects.all()
 
-    # Gráfico de películas por año
+    # Año
     movie_counts_by_year = {}
     for movie in all_movies:
         year = movie.year if movie.year else "None"
@@ -60,22 +60,35 @@ def statistics_view(request):
     buffer.close()
     graphic_year = base64.b64encode(image_png).decode('utf-8')
 
-    # Gráfico de películas por género
+    # Género
     movie_counts_by_genre = {}
     for movie in all_movies:
-        genre = movie.genre if movie.genre else "None"
+        genre = "None"
+    
+        if movie.genre:
+            
+            genres = [g.strip() for g in movie.genre.split(',')]
+            
+            
+            for g in genres:
+                if g.lower() != "short": 
+                    genre = g
+                    break
+            if genre == "None" and "short" in [g.lower() for g in genres]:
+                genre = "Short"
+
         if genre in movie_counts_by_genre:
             movie_counts_by_genre[genre] += 1
         else:
             movie_counts_by_genre[genre] = 1
     bar_positions = range(len(movie_counts_by_genre))
-    plt.figure(figsize=(12, 6))  # Aumentar el tamaño de la figura para acomodar etiquetas largas
+    plt.figure(figsize=(12, 6))  
     plt.bar(bar_positions, movie_counts_by_genre.values(), width=bar_width, align='center')
     plt.title('Películas por Género')
     plt.xlabel('Género')
     plt.ylabel('Número de Películas')
-    plt.xticks(bar_positions, movie_counts_by_genre.keys(), rotation=45, ha='right', fontsize=10)  # Rotar y ajustar el tamaño de la fuente
-    plt.subplots_adjust(bottom=0.4)  # Ajustar espaciado inferior para evitar que se corten las etiquetas
+    plt.xticks(bar_positions, movie_counts_by_genre.keys(), rotation=45, ha='right', fontsize=10)  
+    plt.subplots_adjust(bottom=0.4)  
     buffer = io.BytesIO()
     plt.savefig(buffer, format='png')
     buffer.seek(0)
@@ -84,5 +97,5 @@ def statistics_view(request):
     buffer.close()
     graphic_genre = base64.b64encode(image_png).decode('utf-8')
 
-    # Renderizar la plantilla con ambos gráficos
+    # Gráficos finales
     return render(request, 'statistics.html', {'graphic_year': graphic_year, 'graphic_genre': graphic_genre})
