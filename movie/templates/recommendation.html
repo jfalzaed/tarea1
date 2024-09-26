@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">  
+    <h1>Movie Recommendation</h1>
+
+    <form method="GET"> 
+        <div class="mb-3">
+            <label for="recommendation" class="form-label">Describe the type of movie you're looking for:</label>
+            <textarea name="recommendation" class="form-control" rows="4" placeholder="Enter a movie description..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Get Recommendation</button>
+    </form>   
+
+    {% if recommendation %}
+    <br/>
+    <h2>We recommend you watch:</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4"> 
+        <div class="col">
+            <div class="card">
+                <img src="{{ movies.first.image.url }}" class="card-img-top" alt="{{ movies.first.title }}"> 
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ movies.first.title }}</h5>
+                    <p class="card-text">{{ movies.first.description }}</p>
+                    <p class="card-text"><strong>Genre:</strong> {{ movies.first.genre }}</p>
+                    <p class="card-text"><strong>Year:</strong> {{ movies.first.year }}</p>
+                    {% if movies.first.url %}
+                        <a href="{{ movies.first.url }}" class="btn btn-primary">Watch Now</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <br/><br/> 
+    <h2>Join our mailing list:</h2> 
+    <form action="{% url 'signup' %}"> 
+        <div class="mb-3"> 
+            <label for="email" class="form-label"> Enter your email: </label> 
+            <input type="email" class="form-control" name="email" required /> 
+        </div> 
+        <button type="submit" class="btn btn-primary">Sign Up</button> 
+    </form>
+</div>
+
+{% endblock content %}

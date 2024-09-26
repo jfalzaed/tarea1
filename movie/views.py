@@ -5,8 +5,51 @@ import matplotlib.pyplot as plt
 import matplotlib
 import io
 import urllib, base64
+import numpy as np
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-# Create your views here.
+
+def get_embedding(text, client, model="text-embedding-3-small"):
+   text = text.replace("\n", " ")
+   return client.embeddings.create(input = [text], model=model).data[0].embedding
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+def recommendation(request):
+
+
+    _ = load_dotenv('api_keys.env')
+    client = OpenAI(
+        api_key=os.environ.get('openai_api_key'),
+    )
+
+    req = request.GET.get('recommendation')
+
+    if req:
+
+        items = Movie.objects.all()
+        embeddings = get_embedding(req, client)
+
+        sim = []
+ 
+        for item in items:
+            emb = list(np.frombuffer(item.emb))
+            sim.append(cosine_similarity(emb, embeddings))
+ 
+        idx = int(np.argmax(sim))
+        
+        movies = Movie.objects.filter(title=items[idx].title)
+        print(movies)
+    else:
+ 
+        movies = Movie.objects.all()
+
+
+    return render(request, 'recommendation.html', {'recommendation': req, 'movies': movies})
+
 
 def home(request):
     #return HttpResponse('<h1>Welcome to Home Page</h1>')
